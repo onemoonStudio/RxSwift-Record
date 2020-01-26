@@ -51,13 +51,17 @@ example(of: "subscribe") {
     // observer
     let observable = Observable.of(one, two, three)
     
-    observable.subscribe { event in
+    observable.do(onNext: {
+        print($0)
+    }).subscribe { event in
         print(event)
     }
+    
+    
 }
 
 example(of: "empty") {
-    let emptyObservable = Observable<Void>.empty()
+    let emptyObservable = Observable<Void>.empty().debug()
     
     emptyObservable.subscribe(
         onNext: { element in
@@ -135,4 +139,58 @@ example(of: "deferred") {
         })
         .disposed(by: disposeBag)
     }
+}
+
+example(of: "Single") {
+  // 1
+  let disposeBag = DisposeBag()
+
+  // 2
+  enum FileReadError: Error {
+    case fileNotFound, unreadable, encodingFailed
+  }
+  
+  // 3
+  func loadText(from name: String) -> Single<String> {
+    // 4
+    return Single.create { single in
+        // 1
+        let disposable = Disposables.create()
+
+        // 2
+        guard let path = Bundle.main.path(forResource: name, ofType: "txt") else {
+          single(.error(FileReadError.fileNotFound))
+          return disposable
+        }
+
+        // 3
+        guard let data = FileManager.default.contents(atPath: path) else {
+          single(.error(FileReadError.unreadable))
+          return disposable
+        }
+
+        // 4
+        guard let contents = String(data: data, encoding: .utf8) else {
+          single(.error(FileReadError.encodingFailed))
+          return disposable
+        }
+
+        // 5
+        single(.success(contents))
+        return disposable
+    }
+  }
+    
+
+    loadText(from: "Copyright")
+        .subscribe {
+            switch $0 {
+            case .success(let string):
+                print(string)
+            case .error(let error):
+                print(error)
+            }
+        }
+        .disposed(by: disposeBag)
+    
 }

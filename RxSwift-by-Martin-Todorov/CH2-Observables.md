@@ -106,6 +106,59 @@
   - deferred operator를 사용하자.
   - 이후 외부에서 subscribe를 할 때마다 해당 factory 가 observable을 만들어서 subscriber에게 전달한다.
 
+### Using Traits
+
+- Traits 는 Observable보다 활동이 적은 Observable이다. 사용하는 것은 선택사항이며 observable 대신에 사용할 수도 있다. Traits의 목적은 독자들에게 코드의 의도를 더욱 명확하게 전달하는 것이다.
+- RxSwift에서는 3가지의 Traits 가 있다. Single, Maybe, Completable 이다.
+  1. Single은 .success(value) 혹은 .error event를 발생시킨다.
+     - .success 는 .next(value) 그리고 .completed 이벤트가 합쳐진 결과물이다. 따라서 한번만 사용되는 프로세스에 사용하기에 좋다. (예를 들어 다운로드 혹은 로딩)
+  2. Completable은 .completed 혹은 .error event를 발생시킨다.
+     - 따라서 단순히 실행이 제대로 되었는지 혹은 실패하였는지를 알고 싶을 때 유용하게 사용될 수 있다.
+  3. Maybe의 경우는 Single과 Completable의 조합이다.
+     - .success(value), .completed, .error 를 모두 발생시킬 수 있다.
+     - 따라서 성공 및 실패의 가능성이 있으며, 성공 또한 값이 있을지 없을 지 불확실한 경우 사용된다.
+
+### Challange
+
+1. do operator
+
+   - observable의 method이며 observable을 그대로 리턴한다. subscribe 전 do operator안의 클로저들이 먼저 실행되며 subscribe에 아무런 영향을 미치지 않는다. 
+
+   - 특히 onSubscribe 등 subscribe에 없는 클로저도 있으니 참고하자
+
+   - ```swift
+     someObservable.do(onNext: {
+             print($0)
+         }).subscribe { event in
+             print(event)
+         }
+     ```
+
+2. debug operator
+
+   - side effects를 발생시키는 것도 rx를 디버깅 하는데 좋지만, debug operator가 더욱 유용할 수 있다는 것을 알아두자 observable 의 모든 이벤트를 알려줄 것이다.
+
+   - observable의 메서드이며 다음과 같이 프린트 된다.
+
+   - ```swift
+     020-01-27 00:24:02.196: RxSwiftPlayground.playground:64 (__lldb_expr_3) -> subscribed
+     2020-01-27 00:24:02.197: RxSwiftPlayground.playground:64 (__lldb_expr_3) -> Event completed
+     Completed
+     2020-01-27 00:24:02.197: RxSwiftPlayground.playground:64 (__lldb_expr_3) -> isDisposed
+     ```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
