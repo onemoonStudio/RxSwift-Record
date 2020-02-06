@@ -57,7 +57,16 @@ class MainViewController: UIViewController {
   }
   
   @IBAction func actionSave() {
-    
+    guard let image = imagePreview.image else { return }
+    PhotoWriter.save(image)
+      .asSingle()
+      .subscribe(onSuccess: { [weak self] id in
+        self?.showMessage("saved With id =>  \(id)")
+        self?.actionClear()
+      }, onError: { [weak self] error in
+        self?.showMessage("error", description: error.localizedDescription)
+      })
+      .disposed(by: bag)
   }
   
   @IBAction func actionAdd() {

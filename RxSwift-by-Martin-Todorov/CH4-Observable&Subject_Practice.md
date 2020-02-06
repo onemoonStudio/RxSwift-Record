@@ -45,7 +45,45 @@
 
 #### Wrapping an existing API
 
+- 간단하게 API 가 성공한다면 .next 와 .completed 를 보내면 되고, 에러가 발생하면 custom Error 를 보내면 된다.
+- 마지막으로 return Disposables.create()를 통해서 Observable 이 제대로 리턴되도록 해주자 
 
+##### 궁금한 점 > 왜 Observable일까???
 
+### RxSwift traits in practice
 
+- 특정한 상황에서 굉장히 편리한 traits를 배웠다. 한번 간단하게 리뷰를 해보자
+
+#### Single
+
+- .success(value) 혹은 .error 를 한번만 방출하는 sequence 이다.
+  - 그리고 사실상 .success 라 하면 .next + .completed 의 쌍이다.
+- 보통 대부분의 비동기 작업에 잘 어울리며, 두가지의 use-case 를 생각 해볼 수 있다.
+  1. 성공했을 경우 하나의 element만 방출하는 기능을 wrapping 하는 목적으로 사용할 수 있다.
+  2. 의도적으로 하나의 element만 받는 것을 말할 때, 예를 들어 여러개의 next가 들어온다면 error를 방출할 수도 있다.
+- 따라서 이러한 경우에 single 을 사용하고 싶다면 .asSingle() 을 사용하면 된다.
+
+![image](./imgs/img47.png)
+
+#### Maybe
+
+- single과 굉장히 비슷하다. 단지 다른점 하나는 completed 당시에 value 를 갖고 있지 않을 수도 있다는 점이다.
+- 한마디로 의도된 대로 동작하여 성공한경우, 제대로 동작은 하였지만 의도치 않은 결과가 나오는 경우, 에러가 발생하는 경우 이렇게 나뉠 수 있다.
+- 다른 traits 와 동일하게 직접 create 를 할수도 있고, Observable에 .asMaybe를 할수도 있다.
+
+![image](./imgs/img48.png)
+
+#### Completable
+
+- 단순히 .completed 혹은 .error 를 한번만 방출한다.
+- Observable sequence 를 .ignoreElements() 를 통해서 만들 수 있다. 이 경우 모든 next 가 무시된다.
+
+![image](./imgs/img49.png)
+
+- auto-save 가 가능한 document tool을 만든다고 하면 굉장히 유용하게 쓰일 수 있다.
+  - 예제에서 사용한 andThen 의 경우 성공 이벤트에 더 많은 Compatables 혹은 Observables를 연결할 수 있다. 
+
+### Challenges
+
+- later
 

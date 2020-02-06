@@ -25,36 +25,25 @@
 /// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
-
 import Foundation
-import UIKit
-import Photos
-import RxSwift
 
-class PhotoWriter {
-  enum Errors: Error {
-    case couldNotSavePhoto
-  }
-  
-  static func save(_ image: UIImage) -> Observable<String> {
-    return Observable.create { observer in
-      var savedAssetId: String?
-      PHPhotoLibrary.shared().performChanges({
-        let request = PHAssetChangeRequest.creationRequestForAsset(from: image)
-        savedAssetId = request.placeholderForCreatedAsset?.localIdentifier
-      }, completionHandler: { success, error in
-        DispatchQueue.main.async {
-          if success, let id = savedAssetId {
-            observer.onNext(id)
-            observer.onCompleted()
-          } else {
-            observer.onError(error ?? Errors.couldNotSavePhoto)
-          }
-        }
-      })
-      return Disposables.create()
+public class Example {
+    public static var beforeEach: ((String) -> ())? = nil
+
+    public static func of(_ description: String, action: () -> ()) {
+        beforeEach?(description)
+        printHeader(description)
+        action()
     }
-  }
-  
-  
+
+    private static func printHeader(_ message: String) {
+        print("\nℹ️ \(message):")
+        let length = Float(message.count + 3) * 1.2
+        print(String(repeating: "—", count: Int(length)))
+    }
+}
+
+public func example(of description: String, action: () -> Void) {
+	print("\n——— Example of:", description, "———")
+	action()
 }
